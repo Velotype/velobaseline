@@ -38,13 +38,14 @@ Deno.test("every entry names its feature, and no two say the same", () => {
     for (const d of DENIED) {assertEquals(d.feature.trim().length > 0, true)}
 })
 
-Deno.test("a directory is walked for script files, skipping generated and hidden ones", async () => {
+Deno.test("a directory is walked for script files, skipping declarations, generated and hidden ones", async () => {
     const dir = await Deno.makeTempDir()
     await Deno.mkdir(`${dir}/src`)
     await Deno.mkdir(`${dir}/build`)
     await Deno.mkdir(`${dir}/.cache`)
     await Deno.writeTextFile(`${dir}/src/a.tsx`, "Promise.try(f)\n")
     await Deno.writeTextFile(`${dir}/src/b.css`, "@scope (.x) {}\n")
+    await Deno.writeTextFile(`${dir}/src/types.d.ts`, "commandfor?: string\n")
     await Deno.writeTextFile(`${dir}/build/out.js`, "Promise.try(f)\n")
     await Deno.writeTextFile(`${dir}/.cache/c.ts`, "Promise.try(f)\n")
     const found = await checkPaths([`${dir}/`])
