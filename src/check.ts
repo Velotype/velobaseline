@@ -43,11 +43,16 @@ export function checkSource(file: string, source: string, denied: readonly Denie
     return findings
 }
 
-/** The files to check: a file as given, or every .ts, .tsx, .js and .jsx file under a directory */
+/** Script that runs: .ts, .tsx, .js and .jsx, but not a .d.ts file, whose declarations are types only and never reach a browser */
+function isScript(path: string): boolean {
+    return /\.(tsx?|jsx?)$/.test(path) && !/\.d\.(c|m)?ts$/.test(path)
+}
+
+/** The files to check: a file as given, or every script file under a directory (see isScript) */
 export async function* sourceFiles(path: string): AsyncGenerator<string> {
     const info = await Deno.stat(path)
     if (info.isFile) {
-        if (/\.(tsx?|jsx?)$/.test(path)) {yield path}
+        if (isScript(path)) {yield path}
         return
     }
     for await (const entry of Deno.readDir(path)) {

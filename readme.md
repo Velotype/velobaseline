@@ -7,10 +7,12 @@ Velotype's packages, and the apps built on them, ship their source to browsers w
 ## Use
 
 ```sh
-deno run --allow-read jsr:@velotype/velobaseline@0.1.0 src/ showcase/src/
+deno run --allow-read jsr:@velotype/velobaseline@0.1.1 src/ showcase/src/
 ```
 
-It checks every `.ts`, `.tsx`, `.js` and `.jsx` file under the paths given, skipping `build`, `build-prod`, `output`, `node_modules` and hidden directories. Each use is printed with its file and line, and it exits 1 if it finds any.
+It checks every `.ts`, `.tsx`, `.js` and `.jsx` file under the paths given, except `.d.ts` declarations (types only, they never reach a browser), skipping `build`, `build-prod`, `output`, `node_modules` and hidden directories. Each use is printed with its file and line, and it exits 1 if it finds any.
+
+Deno won't download a version less than 24 hours old (its minimum dependency age), so moving CI to a new version waits a day after its release.
 
 A feature may be used as an enhancement when the page works without it. Say so in a JS comment at the end of the line, or on its own line directly above:
 
