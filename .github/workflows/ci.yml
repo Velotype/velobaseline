@@ -1,0 +1,42 @@
+name: CI
+
+# Every merge to main goes through a pull request, and these checks are required by the ruleset on
+# main, so a PR cannot be merged until all of them pass. A person merges it.
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+# Checks only read the repository; nothing here writes back to it
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: Typecheck, lint, test and publish dry run
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+
+      - name: Typecheck
+        run: deno check mod.ts src/
+
+      - name: Lint
+        run: deno lint
+
+      - name: Test
+        run: deno task test
+
+      # A JSR version is immutable, so the time to find a packaging problem is now and not during
+      # the publish itself.
+      - name: Publish dry run
+        run: deno publish --dry-run
